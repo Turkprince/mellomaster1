@@ -58,6 +58,8 @@
       <button class="tab" onclick="filterItems('rehber', this)">FPS Rehberi</button>
     </div>
 
+    <div id="live-featured-box" style="display:none; margin-bottom:18px;"></div>
+
     <div class="section-title">Güncel Fiyat / Performans Seçkisi</div>
 
     <div class="card" data-cat="ses">
@@ -142,6 +144,31 @@
         c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'block' : 'none';
       });
     }
+
+    fetch('./latest_featured.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d || !d.headline) return;
+        const q = encodeURIComponent(d.search_query || d.headline);
+        const box = document.getElementById('live-featured-box');
+        box.style.display = 'block';
+        box.innerHTML = `
+          <div class="section-title" style="color:#00e1ff;">🔥 Son Videoda İncelenen (${d.slot_key || 'Güncel'})</div>
+          <div class="card" style="border-color:rgba(0,225,255,0.55);">
+            <div class="card-top">
+              <span class="card-tag">${d.pillar || 'Güncel İnceleme'}</span>
+              <span class="fp-pill">Yeni Video</span>
+            </div>
+            <h3>${d.headline}</h3>
+            <p>${d.summary || ''}</p>
+            <div class="shops">
+              <a class="shop-link shop-amz" href="https://www.amazon.com.tr/s?k=${q}" target="_blank" rel="noopener sponsored">Amazon TR</a>
+              <a class="shop-link shop-hb" href="https://www.hepsiburada.com/ara?q=${q}" target="_blank" rel="noopener sponsored">Hepsiburada</a>
+              <a class="shop-link shop-ty" href="https://www.trendyol.com/sr?q=${q}" target="_blank" rel="noopener sponsored">Trendyol</a>
+            </div>
+          </div>`;
+      })
+      .catch(() => {});
   </script>
 </body>
 </html>
